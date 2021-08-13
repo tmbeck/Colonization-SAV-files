@@ -1,4 +1,4 @@
-class Unit:
+class Unit():
     byte_length = 28
 
     orders = {'Road': 0x09, 'Plow': 0x08, 'Go': 0x03,
@@ -111,7 +111,7 @@ class Unit:
         out += '  Unknown: ' + " ".join(['{:02x}'.format(x) for x in self.unknown]).upper()
         return out
 
-class Colonist:
+class Colonist():
     occupations = {'Farmer': 0x00, 'Sugar Planter': 0x01,
                    'Tobacco Planter': 0x02, 'Cotton Planter': 0x03,
                    'Fur Trapper': 0x04, 'Lumberjack': 0x05,

@@ -1,6 +1,6 @@
 from .units import Colonist
 
-class Village:
+class Village():
     byte_length = 18
 
     powers = {'Cherokee': 0x8, 'Arawak': 0x6, 'Inca': 0x4,
@@ -78,7 +78,25 @@ class Village:
         return out
 
 
-class Colony:
+class Colony():
+    byte_length = 202
+
+    def __init__(self, addr):
+        """Creates an instance of colony from the provided address.
+
+        Args:
+            addr (int): Memory address of object to instantiate
+
+        Raises:
+            ValueError: If wrong value
+
+        Returns:
+            Colony: Instance of Colony from addr
+        """
+
+
+class OldColony():
+    byte_length = 202
     buildings = {'Stockade': 0x00, 'Fort': 0x01, 'Fortress': 0x02,
                  'Armory': 0x03, 'Magazine': 0x04, 'Arsenal': 0x05,
                  'Docks': 0x06, 'Drydock': 0x07, 'Shipyard': 0x08,
@@ -135,8 +153,6 @@ class Colony:
                           ['Carpenter\'s Shop', 'Lumber Mill'],
                           ['Church', 'Cathedral'],
                           ['Blacksmith\'s House', 'Blacksmith\'s Shop','Iron Works']]
-
-    byte_length = 202
 
     def __init__(self):
         self.position = (0, 0)

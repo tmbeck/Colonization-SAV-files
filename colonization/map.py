@@ -1,3 +1,6 @@
+from posixpath import basename
+from colonization.buildings import Colony, Village
+from colonization.units import Unit
 import os
 import sys
 import string
@@ -5,6 +8,8 @@ import string
 TERRAIN = 0
 
 class Tile():
+    byte_length = 1
+
     terrain = {'Tundra': 0, 'Tundra Hills': 32, 'Tundra Mountains': 160,
         'Tundra Minor River': 64, 'Tundra Major River': 192,
         'Tundra Hills Minor River': 96, 'Desert': 1, 'Desert Hills': 33,
@@ -54,6 +59,9 @@ class Tile():
         pass
 
 class Map():
+    byte_length = 1
+    base_offset = 0xBBD
+
     __views = [0, 1, 2, 3]
     #views = range(0, 4) # TOOD: Replace with enums
 
@@ -63,6 +71,7 @@ class Map():
         Args:
             path (str): Path to a COLONY 'sav' file.
         """
+        self.file_path = path
         with open(path, "rb") as binary_file:
             # Read the whole file at once
             self.data = binary_file.read()
@@ -79,8 +88,8 @@ class Map():
 
         self.views = []
         for offset in self.__views:
-            address = 0xBBD + self.colonies * 202 + self.units * 28
-            address += self.villages * 18 + offset * self.width * self.height
+            address = self.base_offset + self.colonies * Colony.byte_length + self.units * Unit.byte_length
+            address += self.villages * Village.byte_length + offset * self.width * self.height
             subset = self.data[address:address + self.width * self.height]
             self.views.append((subset, {}))
 
@@ -132,24 +141,23 @@ class Map():
         else:
             print(f"Warning: View type {view} is not fully implemented!")
 
-
-    ### Example of setting a static table for map 3
-    ##if 3 in display:
-    ##    i = display.index(3)
-    ##    table = {0: 'a', 7: 'b', 10: 'c', 11: 'd', 12: 'e', 15: 'f',
-    ##             14: 'g', 13: 'h', 16: 'i', 2: 'j', 4: 'k', 9: 'l',
-    ##             5: 'm', 3: 'n', 6: 'o', 8: 'p', 23: 'q', 24: 'r',
-    ##             27: 's', 30: 't', 31: 'u', 28: 'v', 25: 'w', 1: 'x',
-    ##             20: 'y', 22: 'z', 64: 'A', 192: 'B', 208: 'C', 128: 'D',
-    ##             80: 'E', 144: 'F', 159: 'G', 158: 'H', 221: 'I',
-    ##             220: 'J', 222: 'K', 223: 'L', 156: 'M', 26: 'N',
-    ##             89: 'O', 90: 'P', 91: 'Q', 92: 'R', 88: 'S', 72: 'T',
-    ##             73: 'U', 154: 'V', 153: 'W', 155: 'X', 157: 'Y',
-    ##             188: 'Z', 176: '0', 29: '1', 191: '2', 189: '3', 48: '4',
-    ##             59: '5', 56: '6', 21: '7', 58: '8', 60: '9', 57: '~',
-    ##             61: '!', 63: '@', 62: '#', 42: '$', 43: '%', 47: '^',
-    ##             32: '&'}
-    ##    maps[i] = ((maps[i][0], table)) 
+        ### Example of setting a static table for map 3
+        ##if 3 in display:
+        ##    i = display.index(3)
+        ##    table = {0: 'a', 7: 'b', 10: 'c', 11: 'd', 12: 'e', 15: 'f',
+        ##             14: 'g', 13: 'h', 16: 'i', 2: 'j', 4: 'k', 9: 'l',
+        ##             5: 'm', 3: 'n', 6: 'o', 8: 'p', 23: 'q', 24: 'r',
+        ##             27: 's', 30: 't', 31: 'u', 28: 'v', 25: 'w', 1: 'x',
+        ##             20: 'y', 22: 'z', 64: 'A', 192: 'B', 208: 'C', 128: 'D',
+        ##             80: 'E', 144: 'F', 159: 'G', 158: 'H', 221: 'I',
+        ##             220: 'J', 222: 'K', 223: 'L', 156: 'M', 26: 'N',
+        ##             89: 'O', 90: 'P', 91: 'Q', 92: 'R', 88: 'S', 72: 'T',
+        ##             73: 'U', 154: 'V', 153: 'W', 155: 'X', 157: 'Y',
+        ##             188: 'Z', 176: '0', 29: '1', 191: '2', 189: '3', 48: '4',
+        ##             59: '5', 56: '6', 21: '7', 58: '8', 60: '9', 57: '~',
+        ##             61: '!', 63: '@', 62: '#', 42: '$', 43: '%', 47: '^',
+        ##             32: '&'}
+        ##    maps[i] = ((maps[i][0], table)) 
 
         # Render
         print()

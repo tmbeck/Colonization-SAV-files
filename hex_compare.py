@@ -49,32 +49,31 @@ def old_compare(args):
 
     fields = []
     for data in [data1, data2]:
-
         num_col = data[0x2E]
         num_unit = data[0x2C]
         num_vill = data[0x2A]
         map_width = int.from_bytes(data[0x0C:0x0E], 'little')
         map_height = int.from_bytes(data[0x0E:0x10], 'little')
         
-        field = [('Header', 0, 1),
-                ('Colonies', 0x186, 202),
-                ('Units', 0x186 + 202*num_col, 28),
-                ('Powers', 0x186 + 202*num_col + 28*num_unit, 316),
-                ('Villages', 0x676 + 202*num_col + 28*num_unit, 18),
-                ('Unknown B', 0x676 + 202*num_col + 28*num_unit + 18*num_vill, 1),
-                ('Terrain Map', 0xBBD + 202*num_col + 28*num_unit + 18*num_vill, 1),
-                ('Unknown Map C', 0xBBD + 202*num_col + 28*num_unit +
-                18*num_vill + map_width*map_height, 1),
-                ('Vis Map', 0xBBD + 202*num_col + 28*num_unit +
-                18*num_vill + 2*map_width*map_height, 1),
-                ('Unknown Map D', 0xBBD + 202*num_col + 28*num_unit +
-                18*num_vill + 3*map_width*map_height, 1),
-                ('Unknown E', 0xBBD + 202*num_col + 28*num_unit +
-                18*num_vill + 4*map_width*map_height, 1),
-                ('Unknown F', 0xDB5 + 202*num_col + 28*num_unit +
-                18*num_vill + 4*map_width*map_height, 1),
-                ('Trade Routes', 0xE23 + 202*num_col + 28*num_unit +
-                18*num_vill + 4*map_width*map_height, 74)]
+        # field_name, start, length
+        field = [
+            ('Header       ', 0, col.Header.byte_length),
+            ('Colonies     ', 0x186, col.Colony.byte_length),
+            ('Units        ', 0x186 + col.Colony.byte_length * num_col, col.Unit.byte_length),
+            ('Powers       ', 0x186 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit, col.Power.byte_length),
+            ('Villages     ', 0x676 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit, col.Village.byte_length),
+            
+            ('Unknown B    ', 0x676 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill, col.Map.byte_length),
+            
+            ('Terrain Map  ', 0xBBD + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 0 * map_width * map_height, col.Map.byte_length),
+            ('Unknown Map C', 0xBBD + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 1 * map_width * map_height, col.Map.byte_length),
+            ('Visible Map  ', 0xBBD + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 2 * map_width * map_height, col.Map.byte_length),
+            ('Unknown Map D', 0xBBD + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 3 * map_width * map_height, col.Map.byte_length),
+            ('Unknown E    ', 0xBBD + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 4 * map_width * map_height, col.Map.byte_length),
+            ('Unknown F    ', 0xDB5 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 4 * map_width * map_height, col.Map.byte_length),
+            
+            ('Trade Routes ', 0xE23 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 4 * map_width * map_height, col.TradeRoute.byte_length)
+        ]
         fields.append(field)
 
     print('Start Address')
