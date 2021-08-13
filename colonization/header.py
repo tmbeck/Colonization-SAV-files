@@ -69,8 +69,7 @@ class Header():
         # Parse Colonies
         self.colonies = []
         for i in range(0, self.colony_count):
-            colony = colonization.Colony
-
+            colony = colonization.Colony(self.colonies_start_address + i * colonization.Colony.byte_length)
             self.colonies.append(colony)
 
     def __init__(self, path):

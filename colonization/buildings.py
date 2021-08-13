@@ -81,19 +81,75 @@ class Village():
 class Colony():
     byte_length = 202
 
-    def __init__(self, addr):
-        """Creates an instance of colony from the provided address.
+    def __init__(self, data):
+        self.position = (0, 0)
+        self.name = ''
+        self.power = None
+        self.colonists = []
+        self.fields = {'N': None, 'E': None, 'S': None, 'W': None,
+                       'NW': None, 'NE': None, 'SE': None, 'SW': None}
+        self.built = {}
+        self.custom_house = {}
+        self.hammers = 0
+        self.constructing = None
+        self.storage = {}
+        self.bells = 0
+        self.unknown = b''
+        self.english_count = 1
+        self.french_count = 1
+        self.spanish_count = 1
+        self.dutch_count = 1
 
-        Args:
-            addr (int): Memory address of object to instantiate
+        try:
+            if len(data) != Colony.byte_length:
+                raise ValueError
+            
+            self.position = (data[0], data[1])
+            self.name = data[2:0x19].decode('ascii').split(chr(0))[0]
+            self.power = data[0x1A]
+            
+            lookup = {val: key for key, val in Colonist.specialties.items()}
+            for offset in range(data[0x1F]):
+                worker = Colonist()
+                worker.occupation = lookup[data[0x20 + offset]]
+                worker.specialty = lookup[data[0x40 + offset]]
+                if offset % 2:
+                    worker.time = data[0x60 + offset // 2] >> 4 & 0x0F
+                else:
+                    worker.time = data[0x60 + offset // 2] & 0x0F
+                self.colonists.append(worker)
+            for offset, location in enumerate(self.fields):
+                self.fields[location] = data[0x70 + offset]
+            for name, offset in Colony.buildings.items():
+                temp = int.from_bytes(data[0x84:0x8A], "little")
+                temp = (temp >> offset) & 0x1
+                self.built[name] = bool(temp)
 
-        Raises:
-            ValueError: If wrong value
+            for name, offset in Colony.supplies.items():
+                temp = int.from_bytes(data[0x8A:0x8C], "little")
+                temp = (temp >> offset) & 0x1
+                self.custom_house[name] = bool(temp)
+                
+            self.hammers = int.from_bytes(data[0x92:0x94], "little")
+            self.constructing = next(key for key, value in Colony.constructables.items() if value == data[0x94])
 
-        Returns:
-            Colony: Instance of Colony from addr
-        """
-
+            for name, offset in Colony.supplies.items():
+                stock = data[0x9A + 2 * offset: 0x9C + 2 * offset]
+                self.storage[name] = int.from_bytes(stock, "little")
+            self.english_count = data[0xBA]
+            self.french_count = data[0xBB]
+            self.spanish_count = data[0xBC]
+            self.dutch_count = data[0xBD]
+            self.bells = int.from_bytes(data[0xC2:0xC4], "little")
+            
+            self.unknown = b''.join([data[start:end + 1] for start, end in Colony.unknowns])
+            for start, stop, val in Colony.unused:
+                for address in range(start, stop+1):
+                    if data[address] != val:
+                        raise ValueError(f'******** Unexpected value at {address} in colony {self.name}. Expected: {val}, Read: {data[address]} *******')
+        except Exception as e:
+            print(f"An error occurred when creating a colony: {e}")
+            raise e
 
 class OldColony():
     byte_length = 202
