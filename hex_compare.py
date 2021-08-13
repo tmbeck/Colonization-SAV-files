@@ -133,8 +133,6 @@ def compare(args):
             elif 'Map' in label:
                 print(f' Position ({offset % map_width}),({offset // map_width})', end = '')
             print(')')
-                    
-
 
 def main():
     parser = argparse.ArgumentParser()
