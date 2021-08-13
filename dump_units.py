@@ -34,14 +34,14 @@ def check_args(parser):
     print(args)
     return args
 
-def dump_colonies(args):
+def dump_units(args):
     header = col.Header(args.file)
-    colony_data = [f"{x}\n" for x in header.colonies]
+    unit_data = [f"{x}\n" for x in header.units]
 
     print(
-        f"Colony start address: {header.colonies_start_address}\n" + 
-        f"Colony count: {header.colony_count}\n\n" +
-        '\n'.join(colony_data)
+        f"Unit start address: {header.units_start_address}\n" + 
+        f"Unit count: {header.unit_count}\n\n" +
+        '\n'.join(unit_data)
     )
 
 def main():
@@ -53,7 +53,7 @@ def main():
         print(e)
         sys.exit(1)
     
-    dump_colonies(args)
+    dump_units(args)
 
 if __name__ == "__main__":
     main()

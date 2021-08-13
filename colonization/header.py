@@ -47,7 +47,6 @@ class Header():
             raise ValueError("No data has been read from a file yet!")
         
         marker = self.data[0:len(self.__marker)]
-        print(marker)
 
         if marker != self.__marker:
             raise Exception(f"Unrecognized file type: {self.file_path}")
@@ -69,8 +68,17 @@ class Header():
         # Parse Colonies
         self.colonies = []
         for i in range(0, self.colony_count):
-            colony = colonization.Colony(self.colonies_start_address + i * colonization.Colony.byte_length)
+            colony_start = self.colonies_start_address + i * colonization.Colony.byte_length
+            colony_end   = colony_start + colonization.Colony.byte_length
+            colony = colonization.Colony(self.data[colony_start:colony_end])
             self.colonies.append(colony)
+        
+        self.units = []
+        for i in range(0, self.unit_count):
+            unit_start = self.units_start_address + i * colonization.Unit.byte_length
+            unit_end   = unit_start + colonization.Unit.byte_length
+            unit = colonization.Unit(self.data[unit_start:unit_end])
+            self.units.append(unit)
 
     def __init__(self, path):
         if not os.path.isfile(path):
@@ -78,3 +86,12 @@ class Header():
         
         self.__reader(path)
         self.__parse()
+
+    def __str__(self):
+        colony_data = [f"{x}\n" for x in self.colonies]
+
+        return(
+            f"Colony start address: {self.colonies_start_address}\n" + 
+            f"Colony count: {self.colony_count}\n" +
+            '\n'.join(colony_data)
+        )

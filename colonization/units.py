@@ -52,7 +52,7 @@ class Unit():
     # Cargo space 3 is 4 LSB of byte 14, space 4 is 4 MSB of byte 14
     # Byte 2 looks like unit type (colonist, pioneer, boat, gold, soldier, indian, etc)
     
-    def __init__(self):
+    def __init__(self, data):
         self.position = (0, 0)
         self.power = 0
         self.specialty = ''
@@ -61,11 +61,8 @@ class Unit():
         self.destination = (0, 0)
         self.form = 0
         self.tools = 0
+        self.data = data
 
-    def pack(self):
-        print('packing')
-
-    def unpack(self, data):
         if len(data) != Unit.byte_length:
             raise ValueError
         
@@ -73,8 +70,7 @@ class Unit():
         
         lookup = {val: key for key, val in Unit.forms.items()}
         self.form = lookup[data[2]]
-        
-        
+
         lookup = {val: key for key, val in Unit.powers.items()}
         self.power = lookup[data[3] & 0xF]  #Only 4 LSB is power, 4 MSB unknown
         
@@ -94,9 +90,7 @@ class Unit():
         if self.form == 'Pioneer':
             self.tools = data[21]
 
-
     def __str__(self):
-        
         out = f'Type: {self.form}\n'
         
         if self.form =='Pioneer':
