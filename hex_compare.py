@@ -10,6 +10,7 @@ import os
 import sys
 import string
 import argparse
+import colonization as col
 
 def check_args(parser):
     parser.add_argument("left", type=int, help="Left slot")
@@ -34,7 +35,10 @@ def check_args(parser):
     print(args)
     return args
 
-def compare(args):
+def new_compare(args):
+    (mapl, mapr) = col.Map(args.left), col.Map(args.right)
+
+def old_compare(args):
     with open(args.left, "rb") as binary_file:
             # Read the whole file at once
             data1 = binary_file.read()
@@ -45,6 +49,7 @@ def compare(args):
 
     fields = []
     for data in [data1, data2]:
+
         num_col = data[0x2E]
         num_unit = data[0x2C]
         num_vill = data[0x2A]
@@ -133,6 +138,9 @@ def compare(args):
             elif 'Map' in label:
                 print(f' Position ({offset % map_width}),({offset // map_width})', end = '')
             print(')')
+
+def compare(args):
+    old_compare(args)
 
 def main():
     parser = argparse.ArgumentParser()

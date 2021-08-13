@@ -1,85 +1,6 @@
-"""
-Written by nwagers, 2020
+from .units import Colonist
 
-Intended to be shared by all who are curious.
-Released to the public domain and completely
-unrestricted, but attribution appreciated.
-
-"""
-
-class destination:
-    def __init__(self):
-        self.location = 0
-        self.loads = []
-        self.unloads = []
-
-
-class trade_route:
-    byte_length = 74
-    unknowns = [(35, 35), (43, 43), (45, 45), (53,53),
-                (55, 55), (63, 63), (65, 65), (73, 73)]
-    # The x5 bytes may be related to sea routes involving Europe
-
-    
-    supplies = {'Food': 0x0, 'Sugar': 0x1, 'Tobacco': 0x2,
-                'Cotton': 0x3, 'Furs': 0x4, 'Lumber': 0x5,
-                'Ore': 0x6, 'Silver': 0x7, 'Horses': 0x8,
-                'Rum': 0x9, 'Cigars': 0xA, 'Cloth': 0xB,
-                'Coats': 0xC, 'Trade Goods': 0xD, 'Tools': 0xE,
-                'Muskets': 0xF}
-
-    
-    def __init__(self):
-        self.unknown = b''
-        self.name = ''
-        self.destinations = []
-        self.sea = True
-
-    def pack(self):
-        print('packing')
-
-    def unpack(self, data):
-        if len(data) != trade_route.byte_length:
-            raise ValueError
-
-        self.name = data[0:0x20].decode('ascii').split(chr(0))[0]
-        self.sea = bool(data[32])
-
-        lookup = {val: key for key, val in trade_route.supplies.items()}
-
-        self.destinations = []
-        for offset in range(0, 10 * data[33], 10):
-            dest = destination()
-            dest.location = data[34 + offset]
-
-            cargoes = int.from_bytes(data[37+offset:40+offset], 'little')
-            for item in range(data[36+offset] >> 4 & 0xF):
-                stock = lookup[(cargoes >> (item * 4)) & 0xF]
-                dest.loads.append(stock)
-            
-            cargoes = int.from_bytes(data[40+offset:43+offset], 'little')
-            for item in range(data[36+offset] & 0xF):
-                stock = lookup[(cargoes >> (item * 4)) & 0xF]
-                dest.unloads.append(stock)
-
-            self.destinations.append(dest)
-        
-        self.unknown = b''.join([data[start:end + 1] for start, end in trade_route.unknowns])
-
-    def __str__(self):
-        out = f'Name: {self.name}\n'
-        out += '    Route: Land\n' if not self.sea else '    Route: Sea\n'
-        out += f'    Destinations: {len(self.destinations)}\n'
-        for index, dest in enumerate(self.destinations, 1):
-            out += f'    Stop {index}: {dest.location}\n'
-            out += f'      Loading: {", ".join(dest.loads)}\n'
-            out += f'      Unloading: {", ".join(dest.unloads)}\n'
-        out += '    Unknown: ' + " ".join(['{:02x}'.format(x) for x in self.unknown]).upper()
-        return out
-
-
-
-class village:
+class Village:
     byte_length = 18
 
     powers = {'Cherokee': 0x8, 'Arawak': 0x6, 'Inca': 0x4,
@@ -120,14 +41,14 @@ class village:
         print('packing')
 
     def unpack(self, data):
-        if len(data) != village.byte_length:
+        if len(data) != Village.byte_length:
             raise ValueError
         
         self.position = (data[0], data[1])
-        lookup = {val: key for key, val in village.powers.items()}
+        lookup = {val: key for key, val in Village.powers.items()}
         self.power = lookup[data[2]]
         self.hitpoints = data[4]
-        lookup = {val: key for key, val in village.supplies.items()}
+        lookup = {val: key for key, val in Village.supplies.items()}
         self.last_bought = lookup[data[8]]
         self.last_sold = lookup[data[9]]
         self.english_alarm = data[10]
@@ -138,7 +59,7 @@ class village:
         self.spanish_attacks = data[15]
         self.dutch_alarm = data[16]
         self.dutch_attacks = data[17]
-        self.unknown = b''.join([data[start:end + 1] for start, end in village.unknowns])
+        self.unknown = b''.join([data[start:end + 1] for start, end in Village.unknowns])
 
         
 
@@ -156,144 +77,8 @@ class village:
         out += " ".join(['{:02x}'.format(x) for x in self.unknown]).upper()
         return out
 
-class unit:
 
-    byte_length = 28
-
-    orders = {'Road': 0x09, 'Plow': 0x08, 'Go': 0x03,
-              'No Orders': 0x00, 'Fortified': 0x05, 'Sentry': 0x01,
-              'UNKNOWN2': 0x02, 'UNKNOWN6': 0x06, 'UNKNOWNC': 0x0C,
-              'UNKNOWNB': 0x0B} # May be a Wait, Fortify, Dump cargo
-
-    powers = {'Cherokee': 0x8, 'Dutch': 0x3, 'Spanish': 0x2,
-              'Arawak': 0x6, 'Inca': 0x4, 'Sioux': 0xA,
-              'Iroquois': 0x7, 'Tupi': 0xB, 'French': 0x1,
-              'English': 0x0, 'Aztec': 0x5, 'Apache': 0x9}
-
-    supplies = {'Food': 0x0, 'Sugar': 0x1, 'Tobacco': 0x2,
-                'Cotton': 0x3, 'Furs': 0x4, 'Lumber': 0x5,
-                'Ore': 0x6, 'Silver': 0x7, 'Horses': 0x8,
-                'Rum': 0x9, 'Cigars': 0xA, 'Cloth': 0xB,
-                'Coats': 0xC, 'Trade Goods': 0xD, 'Tools': 0xE,
-                'Muskets': 0xF}
-    forms = {'Colonist': 0x00, 'Galleon': 0x0F, 'Merchantman': 0x0E,
-             'Treasure': 0x0A, 'Braves': 0x13, 'Missionary': 0x03,
-             'Pioneer': 0x02, 'Caravel': 0x0D, 'Soldier': 0x01, 'Dragoon': 0x04,
-             'Artillery': 0x0B, 'Frigate': 0x11, 'Privateer': 0x10,
-             'Wagon Train': 0x0C, 'Armed Braves': 0x14,
-             'Mounted Braves': 0x15, 'Scout': 0x05, 'Mounted Warriors': 0x16,
-             'Man-O-War': 0x12}
-
-    unknowns = [(3, 7), (11, 11), (22, 22), (24, 27)]
-    
-    # When byte 8 is 0x03 it's going to position in byte 9, byte 10
-    # If the unit is a boat and the destination is a sea lane, it will sail to Europe
-    # When byte 8 is 0x08 it's plowing, byte 9 and 10 are unchanged
-    # When byte 8 is 0x00 there are no orders, byte 9 and 10 seem unchanged
-    # When byte 8 is 0x09 it's building a road, byte 9 and 10 seem unchanged
-    # When byte 8 is 0x01 its sentry
-
-    # Byte 5 is related to power. 00 is player, 03 and 0C also on map (ind vs euro?)
-    # Byte 5 went from 0x00 to 0x06 after trading with Iroquois. A "turn taken" flag?
-    # Byte 3, 4 LSB looks like power, 2 for spanish, 3 for dutch, 6 for arawak
-
-    # When 100 -> 80 -> 60 tools, byte 21 goes 0x64 -> 0x50 -> 0x3C
-    # Byte 22 may be moves left this turn
-
-    # Position 243, 243 is enroute to Netherlands
-    # Position 239, 239 is in the Netherlands
-    # Position 235, 235 is leaving Netherlands
-    # Cargo quantities in bytes 16, 17, 18 and 19, 1 byte per location
-    # When sailing to Europe, bytes 9 and 10 are set as the leave/return point
-    # Byte 12 is cargo quantity
-    # Byte 13 and 14 hold cargo type
-    # Cargo space 1 is 4 LSB of byte 13, space 2 is 4 MSB of byte 13
-    # Cargo space 3 is 4 LSB of byte 14, space 4 is 4 MSB of byte 14
-    # Byte 2 looks like unit type (colonist, pioneer, boat, gold, soldier, indian, etc)
-    
-    def __init__(self):
-        self.position = (0, 0)
-        self.power = 0
-        self.specialty = ''
-        self.order = 0
-        self.unknown = b''
-        self.destination = (0, 0)
-        self.form = 0
-        self.tools = 0
-
-    def pack(self):
-        print('packing')
-
-    def unpack(self, data):
-        if len(data) != unit.byte_length:
-            raise ValueError
-        
-        self.position = (data[0], data[1])
-        
-        lookup = {val: key for key, val in unit.forms.items()}
-        self.form = lookup[data[2]]
-        
-        
-        lookup = {val: key for key, val in unit.powers.items()}
-        self.power = lookup[data[3] & 0xF]  #Only 4 LSB is power, 4 MSB unknown
-        
-        lookup = {val: key for key, val in unit.orders.items()}
-        self.order = lookup[data[8]]
-        
-        self.destination = (data[9], data[10])
-        
-        lookup = {val: key for key, val in unit.supplies.items()}
-        self.cargo = []
-        cargoes = int.from_bytes(data[13:16], 'little')
-        for offset in range(data[12]):
-            stock = (lookup[(cargoes >> (offset * 4)) & 0xF], data[16+offset])
-            self.cargo.append(stock)
-        self.specialty = data[23]
-        self.unknown = b''.join([data[start:end + 1] for start, end in unit.unknowns])
-        if self.form == 'Pioneer':
-            self.tools = data[21]
-
-
-    def __str__(self):
-        
-        out = f'Type: {self.form}\n'
-        
-        if self.form =='Pioneer':
-            out += f'  Tools: {self.tools}\n'
-        out += f'Position:{self.position[0]:>3d},{self.position[1]:>3d}\n'
-        out += f'  Power: {self.power}\n'
-        out += f'  Specialty: {self.specialty:02x}\n'
-        out += f'  Order: {self.order}\n'
-        out += f'  Destination: {self.destination}\n'
-        for slot, (name, qty) in enumerate(self.cargo, 1):
-            out += f'    Cargo {slot}: {name} {qty}\n'
-        out += '  Unknown: ' + " ".join(['{:02x}'.format(x) for x in self.unknown]).upper()
-        return out
-
-class colonist:
-    occupations = {'Farmer': 0x00, 'Sugar Planter': 0x01,
-                   'Tobacco Planter': 0x02, 'Cotton Planter': 0x03,
-                   'Fur Trapper': 0x04, 'Lumberjack': 0x05,
-                   'Ore Miner': 0x06, 'Silver Miner': 0x07,
-                   'Fisherman': 0x08, 'Distiller': 0x09,
-                   'Tobacconist': 0x0A, 'Weaver': 0x0B,
-                   'Fur Trader': 0x0C, 'Carpenter': 0x0D,
-                   'Blacksmith': 0x0E, 'Gunsmith': 0x0F,
-                   'Preacher': 0x10, 'Statesman': 0x11,
-                   'Teacher': 0x12}
-    specialties = {'Pioneer': 0x14, 'Veteran Soldier': 0x15,
-                   'Scout': 0x16, 'Veteran Dragoon': 0x17,
-                   'Missionary': 0x18, 'Indentured Servant': 0x19,
-                   'Criminal': 0x1A, 'Indian Convert': 0x1B,
-                   'Free colonist': 0x1C}
-    specialties.update(occupations)
-    
-    def __init__(self):
-        self.occupation = ''
-        self.specialty = ''
-        self.time = 0
-
-class colony:
+class Colony:
     buildings = {'Stockade': 0x00, 'Fort': 0x01, 'Fortress': 0x02,
                  'Armory': 0x03, 'Magazine': 0x04, 'Arsenal': 0x05,
                  'Docks': 0x06, 'Drydock': 0x07, 'Shipyard': 0x08,
@@ -376,16 +161,16 @@ class colony:
         print('packing')
 
     def unpack(self, data):
-        if len(data) != colony.byte_length:
+        if len(data) != Colony.byte_length:
             raise ValueError
         
         self.position = (data[0], data[1])
         self.name = data[2:0x19].decode('ascii').split(chr(0))[0]
         self.power = data[0x1A]
         
-        lookup = {val: key for key, val in colonist.specialties.items()}
+        lookup = {val: key for key, val in Colonist.specialties.items()}
         for offset in range(data[0x1F]):
-            worker = colonist()
+            worker = Colonist()
             worker.occupation = lookup[data[0x20 + offset]]
             worker.specialty = lookup[data[0x40 + offset]]
             if offset % 2:
@@ -395,20 +180,20 @@ class colony:
             self.colonists.append(worker)
         for offset, location in enumerate(self.fields):
             self.fields[location] = data[0x70 + offset]
-        for name, offset in colony.buildings.items():
+        for name, offset in Colony.buildings.items():
             temp = int.from_bytes(data[0x84:0x8A], "little")
             temp = (temp >> offset) & 0x1
             self.built[name] = bool(temp)
 
-        for name, offset in colony.supplies.items():
+        for name, offset in Colony.supplies.items():
             temp = int.from_bytes(data[0x8A:0x8C], "little")
             temp = (temp >> offset) & 0x1
             self.custom_house[name] = bool(temp)
             
         self.hammers = int.from_bytes(data[0x92:0x94], "little")
-        self.constructing = next(key for key, value in colony.constructables.items() if value == data[0x94])
+        self.constructing = next(key for key, value in Colony.constructables.items() if value == data[0x94])
 
-        for name, offset in colony.supplies.items():
+        for name, offset in Colony.supplies.items():
             stock = data[0x9A + 2 * offset: 0x9C + 2 * offset]
             self.storage[name] = int.from_bytes(stock, "little")
         self.english_count = data[0xBA]
@@ -417,8 +202,8 @@ class colony:
         self.dutch_count = data[0xBD]
         self.bells = int.from_bytes(data[0xC2:0xC4], "little")
         
-        self.unknown = b''.join([data[start:end + 1] for start, end in colony.unknowns])
-        for start, stop, val in colony.unused:
+        self.unknown = b''.join([data[start:end + 1] for start, end in Colony.unknowns])
+        for start, stop, val in Colony.unused:
             for address in range(start, stop+1):
                 if data[address] != val:
                     print(f'******** Unexpected value at {address} in colony {self.name}. Expected: {val}, Read: {data[address]} *******')
@@ -463,7 +248,3 @@ class colony:
 
         out += '  Unknown: ' + "  ".join(['{:02x}'.format(x) for x in self.unknown]).upper()
         return out
-
-
-
-

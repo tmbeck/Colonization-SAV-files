@@ -4,6 +4,55 @@ import string
 
 TERRAIN = 0
 
+class Tile():
+    terrain = {'Tundra': 0, 'Tundra Hills': 32, 'Tundra Mountains': 160,
+        'Tundra Minor River': 64, 'Tundra Major River': 192,
+        'Tundra Hills Minor River': 96, 'Desert': 1, 'Desert Hills': 33,
+        'Desert Mountains': 161, 'Desert Minor River': 65,
+        'Desert Major River': 193, 'Desert Hills Minor River': 97,
+        'Plains': 2, 'Plains Hills': 34, 'Plains Mountains': 162,
+        'Plains Minor River': 66, 'Plains Major River': 194,
+        'Plains Hills Minor River': 98, 'Prairie': 3,
+        'Prairie Hills': 35, 'Prairie Mountains': 163,
+        'Prairie Minor River': 67, 'Prairie Major River': 195,
+        'Prairie Hills Minor River': 99, 'Grassland': 4,
+        'Grassland Hills': 36, 'Grassland Mountains': 164,
+        'Grassland Minor River': 68, 'Grassland Major River': 196,
+        'Grassland Hills Minor River': 100, 'Savannah': 5,
+        'Savannah Hills': 37, 'Savannah Mountains': 165,
+        'Savannah Minor River': 69, 'Savannah Major River': 197,
+        'Savannah Hills Minor River': 101, 'Marsh': 6,
+        'Marsh Hills': 38, 'Marsh Mountains': 166,
+        'Marsh Minor River': 70, 'Marsh Major River': 198,
+        'Marsh Hills Minor River': 102, 'Swamp': 7, 'Swamp Hills': 39,
+        'Swamp Mountains': 167, 'Swamp Minor River': 71,
+        'Swamp Major River': 199, 'Swamp Hills Minor River': 103,
+        'Arctic': 24, 'Arctic Hills': 56, 'Arctic Mountains': 184,
+        'Arctic Minor River': 88, 'Arctic Major River': 216,
+        'Arctic Hills Minor River': 120, 'Boreal Forest': 8,
+        'Boreal Forest Minor River': 72,
+        'Boreal Forest Major River': 200, 'Scrub Forest': 9,
+        'Scrub Forest Minor River': 73, 'Scrub Forest Major River': 201,
+        'Mixed Forest': 10, 'Mixed Forest Minor River': 74,
+        'Mixed Forest Major River': 202, 'Broadleaf Forest': 11,
+        'Broadleaf Forest Minor River': 75,
+        'Broadleaf Forest Major River': 203, 'Conifer Forest': 12,
+        'Conifer Forest Minor River': 76,
+        'Conifer Forest Major River': 204, 'Tropical Forest': 13,
+        'Tropical Forest Minor River': 77,
+        'Tropical Forest Major River': 205, 'Wetland Forest': 14,
+        'Wetland Forest Minor River': 78,
+        'Wetland Forest Major River': 206, 'Rain Forest': 15,
+        'Rain Forest Minor River': 79,
+        'Rain Forest Major River': 207, 'Ocean': 25,
+        'Ocean Minor River': 89, 'Ocean Major River': 217,
+        'Sea Lane': 26, 'Sea Lane Minor River': 90,
+        'Sea Lane Major River': 218
+    }
+
+    def __init__(self):
+        pass
+
 class Map():
     __views = [0, 1, 2, 3]
 
