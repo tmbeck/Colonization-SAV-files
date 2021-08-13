@@ -32,10 +32,6 @@ def check_args(parser):
     return args
 
 def display_map(args):
-    #path = 'C:\\GOG Games\\Colonization\\MPS\\COLONIZE\\COLONY{}.SAV'
-    #slot = '00'
-    #path = path.format(slot)
-
     display = [0, 1, 2, 3]  # maps to print and their order [0, 1, 2, 3]
 
     with open(args.file, "rb") as binary_file:
@@ -48,6 +44,9 @@ def display_map(args):
     num_villages = data[0x2a]
     map_width = data[0x0C]
     map_height = data[0x0E]
+
+    print(f"Colonies: {num_colonies}, Units: {num_units}, Villages: {num_villages}")
+    print(f"Map Shape: {map_width}x{map_height}")
 
     maps = []    
     for offset in display:
@@ -151,6 +150,7 @@ def display_map(args):
 
     # Outputs
     for subset, table in maps:
+        print()
         print('0    0    1    1    2    2    3    3    4    4    5    5')
         print('0    5    0    5    0    5    0    5    0    5    0    5')
         for row, start in enumerate(range(0, map_width * map_height, map_width)):
