@@ -3,7 +3,8 @@
 # importers of this package
 
 from .map import(
-    Map
+    Map,
+    Tile
 )
 
 from .units import(

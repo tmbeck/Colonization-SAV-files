@@ -55,6 +55,7 @@ class Tile():
 
 class Map():
     __views = [0, 1, 2, 3]
+    #views = range(0, 4) # TOOD: Replace with enums
 
     def __reader(self, path):
         """Reads the file in path as an array of bytes.
@@ -90,6 +91,9 @@ class Map():
         self.__reader(path)
         self.__parse()
 
+    def get_views():
+        return Map.__views
+
     def shape(self):
         return (self.width, self.height)
 
@@ -115,6 +119,11 @@ class Map():
         # table contains the lookup from binary data to ASCII code
         subset, table = self.views[view]
 
+        ##    # Converts identified terrain to -
+        ##    for key, val in col.Tile.items(): 
+        ##        if val in maps[i][1] and val != 26:
+        ##            maps[i][1][val] = '-'
+
         if view == TERRAIN:
             # Ocean, Ocean Minor River, and Ocean Major River to <space>
             table[25] = ' '
@@ -123,6 +132,26 @@ class Map():
         else:
             print(f"Warning: View type {view} is not fully implemented!")
 
+
+    ### Example of setting a static table for map 3
+    ##if 3 in display:
+    ##    i = display.index(3)
+    ##    table = {0: 'a', 7: 'b', 10: 'c', 11: 'd', 12: 'e', 15: 'f',
+    ##             14: 'g', 13: 'h', 16: 'i', 2: 'j', 4: 'k', 9: 'l',
+    ##             5: 'm', 3: 'n', 6: 'o', 8: 'p', 23: 'q', 24: 'r',
+    ##             27: 's', 30: 't', 31: 'u', 28: 'v', 25: 'w', 1: 'x',
+    ##             20: 'y', 22: 'z', 64: 'A', 192: 'B', 208: 'C', 128: 'D',
+    ##             80: 'E', 144: 'F', 159: 'G', 158: 'H', 221: 'I',
+    ##             220: 'J', 222: 'K', 223: 'L', 156: 'M', 26: 'N',
+    ##             89: 'O', 90: 'P', 91: 'Q', 92: 'R', 88: 'S', 72: 'T',
+    ##             73: 'U', 154: 'V', 153: 'W', 155: 'X', 157: 'Y',
+    ##             188: 'Z', 176: '0', 29: '1', 191: '2', 189: '3', 48: '4',
+    ##             59: '5', 56: '6', 21: '7', 58: '8', 60: '9', 57: '~',
+    ##             61: '!', 63: '@', 62: '#', 42: '$', 43: '%', 47: '^',
+    ##             32: '&'}
+    ##    maps[i] = ((maps[i][0], table)) 
+
+        # Render
         print()
         print('0    0    1    1    2    2    3    3    4    4    5    5')
         print('0    5    0    5    0    5    0    5    0    5    0    5')
