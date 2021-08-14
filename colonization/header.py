@@ -1,6 +1,7 @@
 import colonization
 import os
 import sys
+import binascii
 
 class Header():
     byte_length = 0x186
@@ -60,7 +61,7 @@ class Header():
 
         # Compute base offsets of object groups. They are in order of appearance:
         # Colonies -> Units -> Powers -> Village -> [Maps] -> Trade Routes
-        self.colonies_start_address = self.base_offset + self.byte_length
+        self.colonies_start_address = Header.base_offset + Header.byte_length
         self.units_start_address = self.colonies_start_address + colonization.Colony.byte_length * self.colony_count
         self.powers_start_address = self.units_start_address + colonization.Unit.byte_length * self.unit_count
         self.villages_start_address = self.powers_start_address + colonization.Village.byte_length * self.village_count
@@ -70,13 +71,21 @@ class Header():
         for i in range(0, self.colony_count):
             colony_start = self.colonies_start_address + i * colonization.Colony.byte_length
             colony_end   = colony_start + colonization.Colony.byte_length
+
             colony = colonization.Colony(self.data[colony_start:colony_end])
+            print(binascii.hexlify(self.data[colony_start:colony_end]))
+            print(self.data[colony_start:colony_end])
             self.colonies.append(colony)
         
         self.units = []
         for i in range(0, self.unit_count):
             unit_start = self.units_start_address + i * colonization.Unit.byte_length
             unit_end   = unit_start + colonization.Unit.byte_length
+
+            print(f"Reading unit from {hex(unit_start)} to {hex(unit_end)}")
+            print(binascii.hexlify(self.data[colony_start:colony_end]))
+            #print(self.data[colony_start:colony_end])
+
             unit = colonization.Unit(self.data[unit_start:unit_end])
             self.units.append(unit)
 

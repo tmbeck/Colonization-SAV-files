@@ -76,6 +76,13 @@ def old_compare(args):
         ]
         fields.append(field)
 
+    print(f"Map Dimensions: {map_width}x{map_height}")
+
+    print('Object Counts')
+    print(f"  Colonies: {num_col}  ({hex(col.Colony.byte_length)})")
+    print(f"  Units:    {num_unit} ({hex(col.Unit.byte_length)})")
+    print(f"  Villages: {num_vill} ({hex(col.Village.byte_length)})")
+
     print('Start Address')
     for name, address, _ in fields[0]:
         print(f'  {name:13} 0x{address:04X}')

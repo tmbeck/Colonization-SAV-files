@@ -1,5 +1,4 @@
-from .units import Colonist
-
+from .units import Colonist, Unit
 class Village():
     byte_length = 18
 
@@ -64,8 +63,11 @@ class Village():
         
 
     def __str__(self):
+        lookup = {val: key for key, val in Village.powers.items()}
+        power = lookup[self.power & 0xF]  #Only 4 LSB is power, 4 MSB unknown
+
         out = f'Position: {self.position[0]:>3d},{self.position[1]:>3d}\n'
-        out += f'Power: {self.power}\n'
+        out += f'Power: {power}\n'
         out += f'  Hit points: {self.hitpoints}\n'
         out += f'  Last Bought: {self.last_bought}\n'
         out += f'  Last Sold: {self.last_sold}\n'
@@ -210,9 +212,12 @@ class Colony():
             raise e
 
     def __str__(self):
+        lookup = {val: key for key, val in Colony.powers.items()}
+        power = lookup[self.power & 0xF]  #Only 4 LSB is power, 4 MSB unknown
+
         out = f'Name: {self.name}\n'\
               f'Position: {self.position}\n'\
-              f'  Power: {self.power}\n'\
+              f'  Power: {power}\n'\
               f'  Hammers: {self.hammers}\n'\
               f'  Constructing: {self.constructing}\n'\
               f'  English Count: {self.english_count}\n'\
