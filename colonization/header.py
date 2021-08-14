@@ -3,6 +3,56 @@ import os
 import sys
 import binascii
 
+class SaveFile():
+    def __parse(self):
+        if not self.data:
+            raise ValueError("No data has been read from a file yet!")
+
+        # Parse header        
+        self.header = Header(self.file_path)
+
+        # Parse Colonies
+        self.colonies = []
+        for i in range(0, self.header.colony_count):
+            colony_start = self.header.colonies_start_address + i * colonization.Colony.byte_length
+            colony_end   = colony_start + colonization.Colony.byte_length
+
+            colony = colonization.Colony(self.data[colony_start:colony_end])
+            print(binascii.hexlify(self.data[colony_start:colony_end]))
+            print(self.data[colony_start:colony_end])
+            self.colonies.append(colony)
+        
+        # Parse Units
+        self.units = []
+        for i in range(0, self.header.unit_count):
+            unit_start = self.header.units_start_address + i * colonization.Unit.byte_length
+            unit_end   = unit_start + colonization.Unit.byte_length
+
+            print(f"Reading unit from {hex(unit_start)} to {hex(unit_end)}")
+            print(binascii.hexlify(self.data[colony_start:colony_end]))
+            #print(self.data[colony_start:colony_end])
+
+            unit = colonization.Unit(self.data[unit_start:unit_end])
+
+            if unit.position[0] > self.header.map_width or unit.position[1] > self.header.map_height:
+                print(f"Warning: unit is at position {unit.position} but map is of shape {(self.header.map_width, self.header.map_height)}!")
+                #print(unit)
+
+            self.units.append(unit)
+
+    def __reader(self):
+        with open(self.file_path, "rb") as binary_file:
+            # Read the whole file at once
+            self.data = binary_file.read()
+
+    def __init__(self, path):
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"Failed to read {path}")
+        
+        self.file_path = path
+        self.__reader()
+        self.__parse()
+
 class Header():
     byte_length = 0x186
     base_offset = 0x0
@@ -66,29 +116,6 @@ class Header():
         self.powers_start_address = self.units_start_address + colonization.Unit.byte_length * self.unit_count
         self.villages_start_address = self.powers_start_address + colonization.Village.byte_length * self.village_count
 
-        # Parse Colonies
-        self.colonies = []
-        for i in range(0, self.colony_count):
-            colony_start = self.colonies_start_address + i * colonization.Colony.byte_length
-            colony_end   = colony_start + colonization.Colony.byte_length
-
-            colony = colonization.Colony(self.data[colony_start:colony_end])
-            print(binascii.hexlify(self.data[colony_start:colony_end]))
-            print(self.data[colony_start:colony_end])
-            self.colonies.append(colony)
-        
-        self.units = []
-        for i in range(0, self.unit_count):
-            unit_start = self.units_start_address + i * colonization.Unit.byte_length
-            unit_end   = unit_start + colonization.Unit.byte_length
-
-            print(f"Reading unit from {hex(unit_start)} to {hex(unit_end)}")
-            print(binascii.hexlify(self.data[colony_start:colony_end]))
-            #print(self.data[colony_start:colony_end])
-
-            unit = colonization.Unit(self.data[unit_start:unit_end])
-            self.units.append(unit)
-
     def __init__(self, path):
         if not os.path.isfile(path):
             raise FileNotFoundError(f"Failed to read {path}")
@@ -99,7 +126,7 @@ class Header():
     def __str__(self):
         colony_data = [f"{x}\n" for x in self.colonies]
 
-        return(
+        return (
             f"Colony start address: {self.colonies_start_address}\n" + 
             f"Colony count: {self.colony_count}\n" +
             '\n'.join(colony_data)

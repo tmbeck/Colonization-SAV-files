@@ -67,7 +67,7 @@ class Unit():
             raise ValueError
         
         self.position = (data[0], data[1])
-        
+
         lookup = {val: key for key, val in Unit.forms.items()}
         self.form = lookup[data[2]]
 
@@ -76,17 +76,28 @@ class Unit():
         
         lookup = {val: key for key, val in Unit.orders.items()}
         self.order = lookup[data[8]]
-        
+
+        # TODO: Verify the colonist occupations are accurate and that we're not mixing up occupations and specialities
+        self.specialty = data[23]
+        lookup = {val: key for key, val in {**Colonist.specialties, **Colonist.occupations}.items()}
+
+        try:
+            self.occupation = lookup[data[23]]
+        except KeyError as ke:
+            print(f"{ke}")
+            self.occupation = 'UNKNOWN'
+
         self.destination = (data[9], data[10])
         
         lookup = {val: key for key, val in Unit.supplies.items()}
         self.cargo = []
         cargoes = int.from_bytes(data[13:16], 'little')
+
         for offset in range(data[12]):
             stock = (lookup[(cargoes >> (offset * 4)) & 0xF], data[16+offset])
             self.cargo.append(stock)
-        self.specialty = data[23]
         self.unknown = b''.join([data[start:end + 1] for start, end in Unit.unknowns])
+
         if self.form == 'Pioneer':
             self.tools = data[21]
 
@@ -95,8 +106,9 @@ class Unit():
         
         if self.form =='Pioneer':
             out += f'  Tools: {self.tools}\n'
-        out += f'Position:{self.position[0]:>3d},{self.position[1]:>3d}\n'
+        out += f'Position: {self.position[0]:>3d},{self.position[1]:>3d}\n'
         out += f'  Power: {self.power}\n'
+        out += f'  Occupation: {self.occupation}\n'
         out += f'  Specialty: {self.specialty:02x}\n'
         out += f'  Order: {self.order}\n'
         out += f'  Destination: {self.destination}\n'
@@ -121,6 +133,8 @@ class Colonist():
                    'Missionary': 0x18, 'Indentured Servant': 0x19,
                    'Criminal': 0x1A, 'Indian Convert': 0x1B,
                    'Free colonist': 0x1C}
+    # 0x28: Braves
+    # 0x20: Treasure
     specialties.update(occupations)
     
     def __init__(self):

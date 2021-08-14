@@ -35,12 +35,12 @@ def check_args(parser):
     return args
 
 def dump_units(args):
-    header = col.Header(args.file)
-    unit_data = [f"{x}\n" for x in header.units]
+    save = col.SaveFile(args.file)
+    unit_data = [f"{x}\n" for x in save.units]
 
     print(
-        f"Unit start address: {header.units_start_address}\n" + 
-        f"Unit count: {header.unit_count}\n\n" +
+        f"Unit start address: {save.header.units_start_address}\n" + 
+        f"Unit count: {save.header.unit_count}\n\n" +
         '\n'.join(unit_data)
     )
 

@@ -35,12 +35,12 @@ def check_args(parser):
     return args
 
 def dump_colonies(args):
-    header = col.Header(args.file)
-    colony_data = [f"{x}\n" for x in header.colonies]
+    save = col.SaveFile(args.file)
+    colony_data = [f"{x}\n" for x in save.colonies]
 
     print(
-        f"Colony start address: {header.colonies_start_address}\n" + 
-        f"Colony count: {header.colony_count}\n\n" +
+        f"Colony start address: {save.header.colonies_start_address}\n" + 
+        f"Colony count: {save.header.colony_count}\n\n" +
         '\n'.join(colony_data)
     )
 

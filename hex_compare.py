@@ -79,9 +79,9 @@ def old_compare(args):
     print(f"Map Dimensions: {map_width}x{map_height}")
 
     print('Object Counts')
-    print(f"  Colonies: {num_col}  ({hex(col.Colony.byte_length)})")
-    print(f"  Units:    {num_unit} ({hex(col.Unit.byte_length)})")
-    print(f"  Villages: {num_vill} ({hex(col.Village.byte_length)})")
+    print(f"  Colonies:\t{num_col}\t({hex(col.Colony.byte_length)})")
+    print(f"  Units:\t{num_unit}\t({hex(col.Unit.byte_length)})")
+    print(f"  Villages:\t{num_vill}\t({hex(col.Village.byte_length)})")
 
     print('Start Address')
     for name, address, _ in fields[0]:

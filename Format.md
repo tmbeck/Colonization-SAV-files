@@ -31,6 +31,13 @@ All the colonies of the European powers. Each colony keeps track of colonists wi
 
 Movable units that are not in colonies. Includes ships, wagon trains, colonists, braves, artillery, and treasure of all powers. Units store position, unit type, which power they belong to, their orders, and what types and how much cargo they are carrying.
 
+Units in locations that are off map (e.g. (233, 233) or (239, 239)) are at the port of their European power.
+
+Position 237, 237 -> French Port
+Position 246, 246 -> Spanish
+Position 238, 238 -> Spanish (going to? returning from?)
+Position 233, 233 -> French
+Position 239, 239 -> Dutch
 
 ## Powers
 **Length:** 1264 (0x4F0) bytes
