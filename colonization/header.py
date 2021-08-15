@@ -39,6 +39,16 @@ class SaveFile():
                 #print(unit)
 
             self.units.append(unit)
+        
+        # Parse Powers
+        self.powers = []
+        for i in range(0, 4): # There are only four powers - TODO: constants
+            power_start = self.header.powers_start_address + i * colonization.Power.byte_length
+            power_end   = power_start + colonization.Power.byte_length
+
+            power = colonization.Power(self.data[power_start:power_end], order=i)
+
+            self.powers.append(power)
 
     def __reader(self):
         with open(self.file_path, "rb") as binary_file:
@@ -52,6 +62,20 @@ class SaveFile():
         self.file_path = path
         self.__reader()
         self.__parse()
+    
+    def save(self, path=None, overwrite=True):
+        destination = self.file_path
+        
+        # Overwrite the default if a path is specified
+        if path is not None:
+            destination = self.file_path
+
+        if os.path.isfile(destination):
+            if not overwrite:
+                raise FileExistsError(f"Refusing to overwrite existing file: {destination}")
+
+        with open(destination, 'wb') as f:
+            f.write(bytearray(self.data))
 
 class Header():
     byte_length = 0x186
