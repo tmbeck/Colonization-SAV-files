@@ -8,7 +8,6 @@ unrestricted, but attribution appreciated.
 """
 import os
 import sys
-import string
 import argparse
 
 import colonization as col
@@ -50,9 +49,9 @@ def display_map_new(args):
     map = col.Map(args.file)
 
     for view in col.Map.get_views():
-        print(f"Map View: {view}")
-        print(f"Colonies: {map.colonies}, Units: {map.units}, Villages: {map.villages}")
-        print(f"Map Shape: {map.shape()}")
+        print(f"Map View:\t{view}")
+        print(f"Colonies:\t{map.colonies}, Units: {map.units}, Villages: {map.villages}")
+        print(f"Map Shape:\t{map.shape()}")
 
         map.display(view)
 

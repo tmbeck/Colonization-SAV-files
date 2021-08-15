@@ -7,8 +7,6 @@ unrestricted, but attribution appreciated.
 
 """
 import os
-import sys
-import string
 import argparse
 import colonization as col
 
