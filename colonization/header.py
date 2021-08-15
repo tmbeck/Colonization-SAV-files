@@ -36,7 +36,6 @@ class SaveFile():
 
             if unit.position[0] > self.header.map_width or unit.position[1] > self.header.map_height:
                 print(f"Warning: unit is at position {unit.position} but map is of shape {(self.header.map_width, self.header.map_height)}!")
-                #print(unit)
 
             self.units.append(unit)
         
@@ -49,6 +48,7 @@ class SaveFile():
             power = colonization.Power(self.data[power_start:power_end], order=i)
 
             self.powers.append(power)
+            print(power)
 
     def __reader(self):
         with open(self.file_path, "rb") as binary_file:

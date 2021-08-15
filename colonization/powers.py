@@ -14,13 +14,13 @@ class Power():
     order = ['English', 'French', 'Spanish', 'Dutch', 'Unknown']
 
     def __init__(self, data, order=4):
-        self.taxes = data[self.features['Taxes'][0]:self.features['Taxes'][0]+self.features['Taxes'][1]] 
-        self.gold = data[self.features['Gold'][0]:self.features['Gold'][0]+self.features['Gold'][1]]
+        self.taxes = int.from_bytes(data[self.features['Taxes'][0]:self.features['Taxes'][0]+self.features['Taxes'][1]], byteorder='little')
+        self.gold = int.from_bytes(data[self.features['Gold'][0]:self.features['Gold'][0]+self.features['Gold'][1]], byteorder='little')
         self.name = Power.order[order]
 
     def __str__(self):
-        print(
-            f"Power: {self.name}\n",
-            f"  Tax Rate: {self.taxes}",
-            f"  Gold: {self.gold}"
+        return(
+            f"Power: {self.name}\n" + 
+            f"  Tax Rate: {self.taxes}\n" +
+            f"  Gold: {self.gold}\n"
         )
