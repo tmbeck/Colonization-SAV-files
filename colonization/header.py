@@ -28,8 +28,8 @@ class SaveFile():
             unit_start = self.header.units_start_address + i * colonization.Unit.byte_length
             unit_end   = unit_start + colonization.Unit.byte_length
 
-            print(f"Reading unit from {hex(unit_start)} to {hex(unit_end)}")
-            print(binascii.hexlify(self.data[colony_start:colony_end]))
+            #print(f"Reading unit from {hex(unit_start)} to {hex(unit_end)}")
+            #print(binascii.hexlify(self.data[colony_start:colony_end]))
             #print(self.data[colony_start:colony_end])
 
             unit = colonization.Unit(self.data[unit_start:unit_end])
@@ -48,7 +48,6 @@ class SaveFile():
             power = colonization.Power(self.data[power_start:power_end], order=i)
 
             self.powers.append(power)
-            print(power)
 
     def __reader(self):
         with open(self.file_path, "rb") as binary_file:
