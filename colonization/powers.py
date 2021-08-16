@@ -1,5 +1,7 @@
 class Power():
     byte_length = 316
+    gold_min = 0
+    gold_max = 0x0EFFFF
 
     # See Format.md for more details on this structure.
     
@@ -14,13 +16,46 @@ class Power():
     order = ['English', 'French', 'Spanish', 'Dutch', 'Unknown']
 
     def __init__(self, data, order=4):
-        self.taxes = int.from_bytes(data[self.features['Taxes'][0]:self.features['Taxes'][0]+self.features['Taxes'][1]], byteorder='little')
-        self.gold = int.from_bytes(data[self.features['Gold'][0]:self.features['Gold'][0]+self.features['Gold'][1]], byteorder='little')
+        self._data = data
+        self._taxes = int.from_bytes(data[self.features['Taxes'][0]:self.features['Taxes'][0]+self.features['Taxes'][1]], byteorder='little')
+        self._gold = int.from_bytes(data[self.features['Gold'][0]:self.features['Gold'][0]+self.features['Gold'][1]], byteorder='little')
         self.name = Power.order[order]
 
     def __str__(self):
         return(
             f"Power: {self.name}\n" + 
-            f"  Tax Rate: {self.taxes}\n" +
-            f"  Gold: {self.gold}\n"
+            f"  Tax Rate: {self._taxes}\n" +
+            f"  Gold: {self._gold}\n"
         )
+
+    def serialize(self):
+        # Serialize the object back into self.data and return it to the caller as a bytearra
+        #data[self.features['Gold'][0]]
+        gold = self._gold.to_bytes(3, 'little')
+        data = self.data
+
+        for i in range(0, self.features['Gold'][1]):
+            index = self.features['Gold'][0] + i
+
+            print(f"{index}: '{data[index]:#02x}' '{gold[i]:#02x}'")
+            data[index] = gold[i]
+            print(f"{index}: '{data[index]:#02x}' '{gold[i]:#02x}'")
+
+        assert(self._gold == int.from_bytes(data[self.features['Gold'][0]:self.features['Gold'][0]+self.features['Gold'][1]], byteorder='little'))
+
+        return data
+    
+    @property
+    def data(self):
+        return bytearray(self._data)
+
+    @property
+    def gold(self):
+        return self._gold
+    
+    @gold.setter
+    def gold(self, value):
+        if value < Power.gold_min or value > Power.gold_max:
+            raise ValueError(f"Invalid gold amount: {value}, must be > {self.gold_max} and < {self.gold_min}")
+        else:
+            self._gold = value
