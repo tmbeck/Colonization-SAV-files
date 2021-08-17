@@ -68,6 +68,9 @@ def load_save(args):
         '\n'.join(power_data)
     )
 
+    return save
+
+def modify_save(args, save):
     power = save.powers[args.power]
     old_data = power.data
     power.gold = 123456
@@ -77,6 +80,10 @@ def load_save(args):
     print(new_data)
 
     byte_compare(old_data, new_data)
+
+    sfw = col.SaveFileWriter(save.data)
+    sfw.write_power(data=new_data, index=args.power)
+    
 
 def byte_compare(left, right):
     assert(len(left) == len(right))

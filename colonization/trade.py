@@ -11,7 +11,6 @@ class TradeRoute:
     unknowns = [(35, 35), (43, 43), (45, 45), (53,53),
                 (55, 55), (63, 63), (65, 65), (73, 73)]
     # The x5 bytes may be related to sea routes involving Europe
-
     
     supplies = {'Food': 0x0, 'Sugar': 0x1, 'Tobacco': 0x2,
                 'Cotton': 0x3, 'Furs': 0x4, 'Lumber': 0x5,

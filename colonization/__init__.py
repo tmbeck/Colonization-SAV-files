@@ -27,6 +27,7 @@ from .powers import(
 )
 
 from .header import(
+    SaveFileWriter,
     SaveFile,
     Header
 )

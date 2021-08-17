@@ -1,7 +1,41 @@
-import colonization
 import os
-import sys
 import binascii
+import colonization
+
+class SaveFileWriter():
+    def __init__(self, data):
+        self._data = bytearray(data)
+        self._header = colonization.Header(self._data)
+
+        # TODO: check that data is a valid save?
+
+    def write_power(self, data=None, index=None):
+        if len(data) != colonization.Power.byte_length:
+            raise ValueError(f"invalid data length, got {len(data)}, expected {colonization.Power.byte_length}")
+        if data is None:
+            raise ValueError("data must not be None")
+        if index is None:
+            raise ValueError("index must not be None")
+        
+        if isinstance(index, str):
+            if index not in colonization.Power.order[0:3]:
+                raise ValueError(f"power must be one of {colonization.Power.order[0:3]}")
+            
+            index = colonization.Power.order.index(index)
+
+        if isinstance(index, int):
+            if index not in range(0,len(colonization.Power.order)):
+                raise ValueError(f"power index must be one of {range(0,len(colonization.Power.order))}")
+
+        # To serialize the powers, fetch start address and compute the offset based on the power index.
+        address = self._header.powers_start_address + index * colonization.Power.byte_length
+
+        # Update object in memory
+        for i in range(0, len(data)):
+            self._data[address + i] = data[i]
+
+    def save(self, path, overwrite=True):
+        SaveFile.save(data=self._data, path=path, overwrite=overwrite)
 
 class SaveFile():
     def __parse(self):
@@ -9,7 +43,7 @@ class SaveFile():
             raise ValueError("No data has been read from a file yet!")
 
         # Parse header        
-        self.header = Header(self.file_path)
+        self.header = Header.from_file(self.file_path)
 
         # Parse Colonies
         self.colonies = []
@@ -62,16 +96,29 @@ class SaveFile():
         self.__reader()
         self.__parse()
     
-    def save(self, path=None, overwrite=True):
-        destination = self.file_path
+    @staticmethod
+    def save(data=None, path=None, overwrite=True):
+        if data is None:
+            raise ValueError("data must not be None")
+        if path is None:
+            raise ValueError("path must not be None")
         
-        # Overwrite the default if a path is specified
-        if path is not None:
-            destination = self.file_path
+        destination = path
 
-        if os.path.isfile(destination):
-            if not overwrite:
-                raise FileExistsError(f"Refusing to overwrite existing file: {destination}")
+        if os.path.isfile(destination) and not overwrite:
+            raise FileExistsError(f"Refusing to overwrite existing file: {destination}")
+
+        with open(destination, 'wb') as f:
+            f.write(bytearray(data))
+
+    def save(self, path=None, overwrite=True):
+        if path is None:
+            destination = self.file_path
+        else:
+            destination = path
+
+        if os.path.isfile(destination) and not overwrite:
+            raise FileExistsError(f"Refusing to overwrite existing file: {destination}")
 
         with open(destination, 'wb') as f:
             f.write(bytearray(self.data))
@@ -105,17 +152,6 @@ class Header():
     ('Trade Routes ', 0xE23 + col.Colony.byte_length * num_col + col.Unit.byte_length * num_unit + col.Village.byte_length * num_vill + 4 * map_width * map_height, col.TradeRoute.byte_length)
     """
 
-    def __reader(self, path):
-        """Reads the file in path as an array of bytes.
-
-        Args:
-            path (str): Path to a COLONY 'sav' file.
-        """
-        self.file_path = path
-        with open(path, "rb") as binary_file:
-            # Read the whole file at once
-            self.data = binary_file.read()
-
     def __parse(self):
         if not self.data:
             raise ValueError("No data has been read from a file yet!")
@@ -139,12 +175,21 @@ class Header():
         self.powers_start_address = self.units_start_address + colonization.Unit.byte_length * self.unit_count
         self.villages_start_address = self.powers_start_address + colonization.Village.byte_length * self.village_count
 
-    def __init__(self, path):
+    def __init__(self, data, path=None):
+        self.data = data
+        self.file_path = path
+        self.__parse()
+
+    @classmethod
+    def from_file(cls, path):
         if not os.path.isfile(path):
             raise FileNotFoundError(f"Failed to read {path}")
         
-        self.__reader(path)
-        self.__parse()
+        with open(path, "rb") as binary_file:
+            # Read the whole file at once
+            data = binary_file.read()
+
+        return cls(data, path=path)
 
     def __str__(self):
         colony_data = [f"{x}\n" for x in self.colonies]

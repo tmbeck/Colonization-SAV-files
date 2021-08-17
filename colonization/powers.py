@@ -13,6 +13,8 @@ class Power():
         'Gold': (0x2A, 3)
     }
 
+    # Changing the order of this list or removing 'Unkown' will break this code
+    # and result in unpredictable game behavior
     order = ['English', 'French', 'Spanish', 'Dutch', 'Unknown']
 
     def __init__(self, data, order=4):
