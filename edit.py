@@ -83,7 +83,7 @@ def modify_save(args, save):
 
     sfw = col.SaveFileWriter(save.data)
     sfw.write_power(data=new_data, index=args.power)
-    
+    sfw.save(args.output)
 
 def byte_compare(left, right):
     assert(len(left) == len(right))
@@ -112,7 +112,8 @@ def main():
         sys.exit(1)
     
     # Load, modify, store
-    load_save(args)
-
+    save = load_save(args)
+    modify_save(args, save)
+    
 if __name__ == "__main__":
     main()

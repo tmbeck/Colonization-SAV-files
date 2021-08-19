@@ -35,7 +35,7 @@ class SaveFileWriter():
             self._data[address + i] = data[i]
 
     def save(self, path, overwrite=True):
-        SaveFile.save(data=self._data, path=path, overwrite=overwrite)
+        SaveFile.save_data(data=self._data, path=path, overwrite=overwrite)
 
 class SaveFile():
     def __parse(self):
@@ -97,7 +97,7 @@ class SaveFile():
         self.__parse()
     
     @staticmethod
-    def save(data=None, path=None, overwrite=True):
+    def save_data(data=None, path=None, overwrite=True):
         if data is None:
             raise ValueError("data must not be None")
         if path is None:
@@ -111,6 +111,8 @@ class SaveFile():
         with open(destination, 'wb') as f:
             f.write(bytearray(data))
 
+        print(f"Wrote {len(data)} bytes to file: {destination}")
+
     def save(self, path=None, overwrite=True):
         if path is None:
             destination = self.file_path
@@ -120,8 +122,7 @@ class SaveFile():
         if os.path.isfile(destination) and not overwrite:
             raise FileExistsError(f"Refusing to overwrite existing file: {destination}")
 
-        with open(destination, 'wb') as f:
-            f.write(bytearray(self.data))
+        self.save_data(self.data, self.file_path, overwrite)
 
 class Header():
     byte_length = 0x186
