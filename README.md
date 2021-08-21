@@ -1,32 +1,21 @@
 # Colonization-SAV-files
 SAV file reader, editor, and tools
 
-The goal of this project is to describe as much of the format of the save game files for Colonization 3.0 as possible and to build
-a Python module that can read, modify, and rebuild valid SAV files.
+Based on the work by [nawagers](https://github.com/nawagers/Colonization-SAV-files).
 
-Included are some helper files. The scripts are written for Python 3.6 and should be cross platform. It may be helpful
-to note that Colonization has two autosave slots. File COLONY09.SAV is saved at the end of every turn (when the year changes).
-File COLONY08.SAV is saved at the end of each decade in the game. These are available in the load screen, but not the save
-screen.
+The goal of this project is to describe as much of the format of the save game files for Colonization 3.0 as possible and to build a Python module that can read, modify, and rebuild valid SAV files.
+
+Included are some helper files. The scripts are written for Python 3.6 and should be cross platform. It may be helpful to note that Colonization has two autosave slots. File COLONY09.SAV is saved at the end of every turn (when the year changes). File COLONY08.SAV is saved at the end of each decade in the game. These are available in the load screen, but not the save screen.
 
 ## ALLTERRA.MP
-A map file built with the map editor that features all the different terrain types as islands in the north of the map. The south
-of the map contains 1 large continent. The east coast has all the base terrain types laid out in 3x3 patterns meant to easily build
-coastal and inland colonies. The colony should be located 1 tile north of the moutains. This gives 1 mountain square for ore, 1 sea
-square for fishing and sea port, and 6 forested squares. The north and west sides of the colony have a river for faster piece
-movement. The next 3x3 grid inland features the same base terrain type but only has 1 forested square in the E. The SE ocean tile
-allows for fishing over farming.
+A map file built with the map editor that features all the different terrain types as islands in the north of the map. The south of the map contains 1 large continent. The east coast has all the base terrain types laid out in 3x3 patterns meant to easily build coastal and inland colonies. The colony should be located 1 tile north of the moutains. This gives 1 mountain square for ore, 1 sea square for fishing and sea port, and 6 forested squares. The north and west sides of the colony have a river for faster piece movement. The next 3x3 grid inland features the same base terrain type but only has 1 forested square in the E. The SE ocean tile allows for fishing over farming.
 
 Further west along the north shore is larger 5x5 terrain sections, with 1 cental mountain and a river running N/S on the west edge.
 
 ## hex_compare.py
-A helper script to compare the hex differences between two files with the address ranges programmed in. If a different number of
-units, colonies, or villages exists, it will attempt to drop that section and compare the remainder. The way to use the script is
-to edit the path variable at the top and plug in the save file numbers that you want to compare.
+A helper script to compare the hex differences between two files with the address ranges programmed in. If a different number of units, colonies, or villages exists, it will attempt to drop that section and compare the remainder. The way to use the script is to edit the path variable at the top and plug in the save file numbers that you want to compare.
 
-Generally you want to make as few changes as possible between comparisons. If you're going to have a unit perform an action, try to
-have the next unit in the move order list have no orders so the game will wait for you to do something. Use a similar unit pause
-concept for other actions too.
+Generally you want to make as few changes as possible between comparisons. If you're going to have a unit perform an action, try to have the next unit in the move order list have no orders so the game will wait for you to do something. Use a similar unit pause concept for other actions too.
 
 Example: You want to see how "load food" is stored in a trade route:
 1. Create a trade route that has load food at the first stop.
@@ -55,41 +44,31 @@ Example: You want to see how a pioneer stores the remaining tools she has:
 
 
 ## colmapplotter.py
-A helper script to visualize map data in a SAV file. There are 4 maps in a save game. At the
-top of the script, edit the path as appropriate and select the file slot you want. Choose which
-maps to display (0-3). Run the script and it will use characters to represent each tile. It may
-help to pick a more square font, like 'terminal'.
+A helper script to visualize map data in a SAV file. There are 4 maps in a save game. At the top of the script, edit the path as appropriate and select the file slot you want. Choose which maps to display (0-3). Run the script and it will use characters to represent each tile. It may help to pick a more square font, like 'terminal'.
 
-In the static tables section there are examples of how to edit the maps. For example, once a terrain tile is
-identified, it can be switched to dispaly a '-' in it's place, making it easier to see the remaining tiles.
-Another good use on the terrain map is to change the Ocean tiles to ' '.
+In the static tables section there are examples of how to edit the maps. For example, once a terrain tile is identified, it can be switched to dispaly a '-' in it's place, making it easier to see the remaining tiles. Another good use on the terrain map is to change the Ocean tiles to ' '.
 
-If comparing the maps between different saves, you'll want to set up static tables so that the same hex value
-maps to the same letter on each run. The dynamic code assigns them in the order they are first seen, so a
-change in the north can completely change the characters used in the south. There is an example commented out in
-the code. Run the code the first time with dynamic tables and then copy the table it prints out and paste it in
-the code. Sometimes this results in a 'KeyError'. Just add the key to the static table and run it again.
+If comparing the maps between different saves, you'll want to set up static tables so that the same hex value maps to the same letter on each run. The dynamic code assigns them in the order they are first seen, so a change in the north can completely change the characters used in the south. There is an example commented out in the code. Run the code the first time with dynamic tables and then copy the table it prints out and paste it in the code. Sometimes this results in a 'KeyError'. Just add the key to the static table and run it again.
 
 
 ## format.md
-This is an outline of the sections in the save file. It does not detail every byte, but describes each section,
-where it starts, and the section's length. Important bytes are noted. A more detailed byte map is coming, and
-the current version is here: https://docs.google.com/spreadsheets/d/1_IOGjJbMT43z2Tcr-Rhdwkg65iBaAV7Lo3XRl-08hII/edit?usp=sharing
+This is an outline of the sections in the save file. It does not detail every byte, but describes each section, where it starts, and the section's length. Important bytes are noted. A more detailed byte map is coming, and the current version is here: https://docs.google.com/spreadsheets/d/1_IOGjJbMT43z2Tcr-Rhdwkg65iBaAV7Lo3XRl-08hII/edit?usp=sharing
 
 ## Future
 A python module that fully reads the data and puts it in standard Python structures is partially made. It shouldn't be considered a library with a fixed interface at this point. Right now you have to manually feed the byte ranges to the appropriate structures. Here is what colonies look like:
 
-        first_col = 0x186
-        col_offsets = [first_col + colony.byte_length * x for x in range(num_colonies)]
+```python
+first_col = 0x186
+col_offsets = [first_col + colony.byte_length * x for x in range(num_colonies)]
 
-        colonies = []
-        for offset in col_offsets:
-            mycol = colony()
-            mycol.unpack(data[offset:offset + colony.byte_length])
-            colonies.append(mycol)
+colonies = []
+for offset in col_offsets:
+    mycol = colony()
+    mycol.unpack(data[offset:offset + colony.byte_length])
+    colonies.append(mycol)
+```
 
-
-The data should be opened from a file and read in as binary in mode "rb"
+The data should be opened from a file and read in as binary in mode "rb".
 
 ## License
 
