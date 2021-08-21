@@ -3,6 +3,9 @@ class Power():
     gold_min = 0
     gold_max = 0x0EFFFF
 
+    tax_min = 0
+    tax_max = 99
+
     # See Format.md for more details on this structure.
     
     # Features are tuples. Each tuple contains the offset and length from the base address of the power.
@@ -33,8 +36,24 @@ class Power():
     def serialize(self):
         # Serialize the object back into self.data and return it to the caller as a bytearra
         #data[self.features['Gold'][0]]
-        gold = self._gold.to_bytes(3, 'little')
+        modified_features = self.features
+
+        gold = self._gold.to_bytes(self.features['Gold'][1], 'little')
+        taxes = self._taxes.to_bytes(self.features['Taxes'][1], 'little')
         data = self.data
+
+#        for x in self.features:
+#            for y in range(0, self.features[x][1]):
+#                index = self.features[x][0] + y
+#                
+#                print(f"")
+#                data[index] = x
+#                print(f"")
+#            pass
+
+        for i in range(0, self.features['Taxes'][1]):
+            index = self.features['Taxes'][0] + i
+            data[index] = taxes[i]
 
         for i in range(0, self.features['Gold'][1]):
             index = self.features['Gold'][0] + i
@@ -50,6 +69,17 @@ class Power():
     @property
     def data(self):
         return bytearray(self._data)
+
+    @property
+    def tax(self):
+        return self._taxes
+    
+    @tax.setter
+    def tax(self, value):
+        if value < Power.tax_min or value > Power.tax_max:
+            raise ValueError("Invalid tax rate: {value}, must be > {self.tax_max} and < {self.tax_min}")
+        else:
+            self._taxes = value
 
     @property
     def gold(self):

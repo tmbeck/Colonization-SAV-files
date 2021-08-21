@@ -18,6 +18,7 @@ def check_args(parser):
     group2 = parser.add_argument_group(title='Values')
     group2.add_argument("-p", "--power", required=True, type=int, choices=range(0,4), metavar="[0-3]", help="The index of the power in [English, French, Spanish, Dutch] to modify")
     group2.add_argument("-g", "--gold", type=int, default=None, help="Set the gold of the indexed power.")
+    group2.add_argument("-t", "--taxes", type=int, default=None, help="Set the ta rate of the indexed power.")
     args = parser.parse_args()
 
     if args.directory is None and args.file is None:
@@ -74,6 +75,7 @@ def modify_save(args, save):
     power = save.powers[args.power]
     old_data = power.data
     power.gold = 123456
+    power.tax
     new_data = power.serialize()
 
     print(old_data)
