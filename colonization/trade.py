@@ -1,4 +1,3 @@
-
 class Destination:
     def __init__(self):
         self.location = 0

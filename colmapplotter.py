@@ -1,11 +1,3 @@
-"""
-Written by nwagers, 2020
-
-Intended to be shared by all who are curious.
-Released to the public domain and completely
-unrestricted, but attribution appreciated.
-
-"""
 import os
 import sys
 import argparse

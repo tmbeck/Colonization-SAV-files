@@ -90,3 +90,9 @@ A python module that fully reads the data and puts it in standard Python structu
 
 
 The data should be opened from a file and read in as binary in mode "rb"
+
+## License
+
+See the [license](LICENSE.md).
+
+Code in this repository was originally written by nwagers, 2020.
